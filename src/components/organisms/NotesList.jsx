@@ -244,43 +244,41 @@ element.classList.contains('highlight-custom'))) {
         }
     };
 return (
-<div className="space-y-4">
-{showHighlightToolbar && (
-<div className="mb-4 p-2 bg-gray-50 rounded-lg border">
-<div className="flex items-center space-x-2">
-<span className="text-sm text-gray-600">Highlight:</span>
-{['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
-<button
-key={color}
-onClick={() => handleHighlight(color, getColorValue(color))}
-className={`w-6 h-6 rounded border-2 ${selectedColor === color ? 'border-gray-800' : 'border-gray-300'}`}
-style={{ backgroundColor: getColorValue(color) }}
-title={`Highlight with ${color}`}
-/>
-))}
-<button
-onClick={handleRemoveHighlight}
-className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
-title="Remove highlight"
->
-Remove
-</button>
-</div>
-</div>
-)}
+    <div className="space-y-4">
+        {showHighlightToolbar && (
+            <div className="mb-4 p-2 bg-gray-50 rounded-lg border">
+                <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">Highlight:</span>
+                    {['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
+                        <button
+                            key={color}
+                            onClick={() => handleHighlight(color, getColorValue(color))}
+                            className={`w-6 h-6 rounded border-2 ${selectedColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+                            style={{ backgroundColor: getColorValue(color) }}
+                            title={`Highlight with ${color}`}
+                        />
+                    ))}
+                    <button
+                        onClick={handleRemoveHighlight}
+                        className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                        title="Remove highlight"
+                    >
+                        Remove
+                    </button>
+                </div>
+            </div>
+        )}
 
-<div
-            <div
-                ref={editorRef}
-                contentEditable
-                className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor"
-                style={{ whiteSpace: 'pre-wrap' }}
-                dangerouslySetInnerHTML={{ __html: editContent }}
-                onInput={(e) => onEditContentChange(e.target.innerHTML)}
-                onBlur={() => setShowHighlightToolbar(false)}
-                placeholder="Edit your note..."
-            />
-            
+        <div
+            ref={editorRef}
+            contentEditable
+            className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor"
+            style={{ whiteSpace: 'pre-wrap' }}
+            dangerouslySetInnerHTML={{ __html: editContent }}
+            onInput={(e) => onEditContentChange(e.target.innerHTML)}
+            onBlur={() => setShowHighlightToolbar(false)}
+            placeholder="Edit your note..."
+        />
             <div className="flex items-center space-x-2">
                 <Button
                     onClick={handleSave}
