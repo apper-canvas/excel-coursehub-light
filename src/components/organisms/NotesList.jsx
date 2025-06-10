@@ -75,30 +75,13 @@ const NotesList = ({
                         </div>
                     </div>
 {editingNote && editingNote.id === note.id ? (
-                        <div className="space-y-4">
-                            <textarea
-                                value={editContent}
-                                onChange={(e) => onEditContentChange(e.target.value)}
-                                className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                                placeholder="Edit your note..."
-                            />
-                            <div className="flex items-center space-x-2">
-                                <Button
-                                    onClick={onSaveNote}
-                                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
-                                >
-                                    <ApperIcon name="Check" className="w-4 h-4 mr-1" />
-                                    Save
-                                </Button>
-                                <Button
-                                    onClick={onCancelEdit}
-                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                                >
-                                    <ApperIcon name="X" className="w-4 h-4 mr-1" />
-                                    Cancel
-                                </Button>
-                            </div>
-                        </div>
+                        <NoteEditor
+                            note={editingNote}
+                            editContent={editContent}
+                            onEditContentChange={onEditContentChange}
+                            onSaveNote={onSaveNote}
+                            onCancelEdit={onCancelEdit}
+                        />
                     ) : (
                         <div 
                             className="prose prose-sm max-w-none text-gray-700 break-words cursor-pointer hover:bg-gray-50 rounded p-2 -m-2 transition-colors"
@@ -127,9 +110,10 @@ const NoteEditor = ({
     onCancelEdit 
 }) => {
     const [selectedColor, setSelectedColor] = useState('yellow');
-    const [isSaving, setIsSaving] = useState(false);
+const [isSaving, setIsSaving] = useState(false);
     const editorRef = useRef(null);
-    const [showHighlightToolbar, setShowHighlightToolbar] = useState(false);
+    const [showHighlightToolbar, setShowHighlightToolbar] = useState(true);
+    const [hasSelection, setHasSelection] = useState(false);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -153,13 +137,12 @@ const NoteEditor = ({
     useEffect(() => {
         const handleSelection = () => {
             const selection = window.getSelection();
-            setShowHighlightToolbar(selection.toString().length > 0);
+            setHasSelection(selection.toString().length > 0);
         };
 
         document.addEventListener('selectionchange', handleSelection);
         return () => document.removeEventListener('selectionchange', handleSelection);
     }, []);
-
     const getColorValue = (colorName) => {
         const colorMap = {
             yellow: '#fef3c7',
@@ -196,9 +179,9 @@ const NoteEditor = ({
             onEditContentChange(newContent);
         }
         
-        // Clear selection
+// Clear selection
         selection.removeAllRanges();
-        setShowHighlightToolbar(false);
+        setHasSelection(false);
     };
 
     const handleRemoveHighlight = () => {
@@ -224,12 +207,12 @@ element.classList.contains('highlight-custom'))) {
             // Update content
             if (editorRef.current) {
                 const newContent = editorRef.current.innerHTML;
-                onEditContentChange(newContent);
+onEditContentChange(newContent);
             }
         }
         
         selection.removeAllRanges();
-        setShowHighlightToolbar(false);
+        setHasSelection(false);
     };
 
     const handleSave = async () => {
@@ -244,41 +227,63 @@ element.classList.contains('highlight-custom'))) {
         }
     };
 return (
-    <div className="space-y-4">
-        {showHighlightToolbar && (
-            <div className="mb-4 p-2 bg-gray-50 rounded-lg border">
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Highlight:</span>
+        <div className="space-y-4">
+            {/* Highlight Toolbar - Always visible when editing */}
+            <div className="p-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/20 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                        <ApperIcon name="Highlighter" className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium text-gray-700">Text Highlighter</span>
+                        {hasSelection && (
+                            <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                                Text Selected
+                            </span>
+                        )}
+                    </div>
+                    <span className="text-xs text-gray-500">Ctrl+Shift+H</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                    <span className="text-sm text-gray-600">Colors:</span>
                     {['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
                         <button
                             key={color}
-                            onClick={() => handleHighlight(color, getColorValue(color))}
-                            className={`w-6 h-6 rounded border-2 ${selectedColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+                            onClick={() => {
+                                setSelectedColor(color);
+                                handleHighlight(color, getColorValue(color));
+                            }}
+                            className={`w-8 h-8 rounded-lg border-2 hover:scale-110 transition-all duration-200 ${
+                                selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 hover:border-gray-400'
+                            }`}
                             style={{ backgroundColor: getColorValue(color) }}
                             title={`Highlight with ${color}`}
+                            disabled={!hasSelection}
                         />
                     ))}
+                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
                     <button
                         onClick={handleRemoveHighlight}
-                        className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
-                        title="Remove highlight"
+                        className="px-3 py-1.5 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
+                        title="Remove highlight from selected text"
+                        disabled={!hasSelection}
                     >
+                        <ApperIcon name="X" className="w-3 h-3 mr-1 inline" />
                         Remove
                     </button>
                 </div>
+                {!hasSelection && (
+                    <p className="text-xs text-gray-500 mt-2">Select text above to highlight it</p>
+                )}
             </div>
-        )}
 
-        <div
-            ref={editorRef}
-            contentEditable
-            className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor"
-            style={{ whiteSpace: 'pre-wrap' }}
-            dangerouslySetInnerHTML={{ __html: editContent }}
-            onInput={(e) => onEditContentChange(e.target.innerHTML)}
-            onBlur={() => setShowHighlightToolbar(false)}
-            placeholder="Edit your note..."
-        />
+            <div
+                ref={editorRef}
+                contentEditable
+                className="w-full min-h-[120px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor bg-white shadow-sm"
+                style={{ whiteSpace: 'pre-wrap' }}
+                dangerouslySetInnerHTML={{ __html: editContent }}
+                onInput={(e) => onEditContentChange(e.target.innerHTML)}
+                placeholder="Edit your note..."
+            />
             <div className="flex items-center space-x-2">
                 <Button
                     onClick={handleSave}
