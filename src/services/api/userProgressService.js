@@ -1,11 +1,50 @@
-// Simulated current user - in a real app this would come from authentication
-const currentUser = {
-  id: "user1",
-  name: "John Doe",
-  email: "john.doe@example.com"
+import { toast } from 'react-toastify';
+
+// Mock data for user progress
+let userProgressData = {
+  courses: {},
+  notes: [],
+  favorites: [],
+  certificates: []
 };
 
-let userProgressData = [
+// Helper function to sanitize content while preserving highlights
+const sanitizeContent = (content) => {
+  if (!content) return '';
+  
+  // Allow only highlight spans and basic formatting
+  const allowedTags = ['span', 'br', 'strong', 'em', 'p'];
+  const allowedClasses = ['highlight-yellow', 'highlight-green', 'highlight-blue', 'highlight-pink', 'highlight-orange', 'highlight-custom'];
+  
+  // Create a temporary div to parse HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = content;
+  
+  // Remove script tags and other dangerous elements
+  const scripts = tempDiv.querySelectorAll('script, object, embed, iframe');
+  scripts.forEach(script => script.remove());
+  
+  // Filter spans to only allow highlight classes
+  const spans = tempDiv.querySelectorAll('span');
+  spans.forEach(span => {
+    const hasValidClass = allowedClasses.some(cls => span.classList.contains(cls));
+    if (!hasValidClass && !span.style.backgroundColor) {
+      // Replace with text content if not a valid highlight span
+      span.replaceWith(document.createTextNode(span.textContent));
+    }
+  });
+return tempDiv.innerHTML;
+};
+
+// Mock current user
+const currentUser = {
+  id: "user1",
+  name: "Current User",
+  email: "user@example.com"
+};
+
+// Mock user progress array
+const userProgressArray = [
   {
     id: "1",
     userId: "user1", // Associate with current user
@@ -73,26 +112,42 @@ const userProgressService = {
   async getAll(userId = null) {
     await delay(250);
     if (userId) {
-      return userProgressData.filter(p => p.userId === userId).map(p => ({ ...p }));
+      return userProgressArray.filter(p => p.userId === userId).map(p => ({ ...p }));
     }
-    return [...userProgressData];
+    return userProgressArray.map(p => ({ ...p }));
   },
 
-  // Get user's progress only
-  async getUserProgress(userId = currentUser.id) {
-    await delay(250);
-    return userProgressData.filter(p => p.userId === userId).map(p => ({ ...p }));
+  // Update note method
+  updateNote: async (noteId, courseId, content) => {
+updateNote: async (noteId, courseId, content) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          const noteIndex = userProgressData.notes.findIndex(note => note.id === noteId);
+          if (noteIndex === -1) {
+            reject(new Error('Note not found'));
+            return;
+          }
+
+          // Sanitize content while preserving highlights
+          const sanitizedContent = sanitizeContent(content);
+
+          userProgressData.notes[noteIndex] = {
+            ...userProgressData.notes[noteIndex],
+            content: sanitizedContent,
+            updatedAt: new Date().toISOString()
+          };
+
+          const updatedNote = { ...userProgressData.notes[noteIndex] };
+          resolve(updatedNote);
+        } catch (error) {
+          reject(error);
+        }
+      }, 300);
+    });
   },
 
-  async getById(id) {
-    await delay(200);
-    const progress = userProgressData.find(p => p.id === id);
-    if (!progress) {
-      throw new Error('Progress not found');
-    }
-    return { ...progress };
-  },
-
+  // Create new progress record
   async create(progressData) {
     await delay(400);
     const newProgress = {
@@ -100,35 +155,78 @@ const userProgressService = {
       userId: currentUser.id, // Always associate with current user
       ...progressData
     };
-    userProgressData.push(newProgress);
+    userProgressArray.push(newProgress);
     return { ...newProgress };
   },
+},
 
+  // Update progress record
   async update(id, progressData) {
     await delay(350);
-    const index = userProgressData.findIndex(p => p.id === id);
+    const index = userProgressArray.findIndex(p => p.id === id);
     if (index === -1) {
       throw new Error('Progress not found');
     }
-    const updatedProgress = { ...userProgressData[index], ...progressData };
-    userProgressData[index] = updatedProgress;
-    return { ...updatedProgress };
+    userProgressArray[index] = {
+      ...userProgressArray[index],
+      ...progressData
+    };
+    return { ...userProgressArray[index] };
   },
 
+  // Delete progress record
   async delete(id) {
     await delay(300);
-    const index = userProgressData.findIndex(p => p.id === id);
+    const index = userProgressArray.findIndex(p => p.id === id);
     if (index === -1) {
       throw new Error('Progress not found');
     }
-    userProgressData.splice(index, 1);
+    userProgressArray.splice(index, 1);
     return { success: true };
   },
 
-  // Update a specific note
-  async updateNote(courseId, noteId, noteData) {
+  // Add new note
+  async addNote(courseId, lessonId, content, courseName = '', lessonName = '') {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          // Sanitize content while preserving highlights
+          const sanitizedContent = sanitizeContent(content);
+          
+          const note = {
+            id: Date.now().toString(),
+            userId: currentUser.id,
+            courseId,
+            lessonId,
+            courseName,
+            lessonName,
+            content: sanitizedContent,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          // Add to global notes array
+          userProgressData.notes.push(note);
+
+          // Also add to progress record if it exists
+          const progress = userProgressArray.find(p => p.courseId === courseId && p.userId === currentUser.id);
+          if (progress) {
+            progress.notes.push(note);
+          }
+
+          resolve(note);
+        } catch (error) {
+          reject(error);
+        }
+      }, 300);
+    });
+  },
+},
+
+  // Update a specific note (alternative method)
+  async updateSpecificNote(courseId, noteId, noteData) {
     await delay(300);
-    const progress = userProgressData.find(p => p.courseId === courseId && p.userId === currentUser.id);
+    const progress = userProgressArray.find(p => p.courseId === courseId && p.userId === currentUser.id);
     if (!progress) {
       throw new Error('Progress not found');
     }
@@ -138,7 +236,7 @@ const userProgressService = {
       throw new Error('Note not found');
     }
     
-// Clean up content for storage - preserve highlights but sanitize
+    // Clean up content for storage - preserve highlights but sanitize
     const cleanContent = noteData.content 
       ? noteData.content
           .replace(/<div>/g, '\n')
@@ -156,6 +254,12 @@ const userProgressService = {
       content: cleanContent || progress.notes[noteIndex].content,
       updatedAt: new Date()
     };
+    
+    // Also update in global notes array
+    const globalNoteIndex = userProgressData.notes.findIndex(n => n.id === noteId);
+    if (globalNoteIndex !== -1) {
+      userProgressData.notes[globalNoteIndex] = { ...progress.notes[noteIndex] };
+    }
     
     return { ...progress.notes[noteIndex] };
   }
