@@ -119,7 +119,6 @@ const userProgressService = {
 
   // Update note method
   updateNote: async (noteId, courseId, content) => {
-updateNote: async (noteId, courseId, content) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         try {
@@ -158,7 +157,6 @@ updateNote: async (noteId, courseId, content) => {
     userProgressArray.push(newProgress);
     return { ...newProgress };
   },
-},
 
   // Update progress record
   async update(id, progressData) {
@@ -221,7 +219,6 @@ updateNote: async (noteId, courseId, content) => {
       }, 300);
     });
   },
-},
 
   // Update a specific note (alternative method)
   async updateSpecificNote(courseId, noteId, noteData) {
