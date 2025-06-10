@@ -1,7 +1,7 @@
-import BrowseCourses from '../pages/BrowseCourses';
-import MyCourses from '../pages/MyCourses';
-import Favorites from '../pages/Favorites';
-import Notes from '../pages/Notes';
+import BrowseCoursesPage from '@/components/pages/BrowseCoursesPage';
+import MyCoursesPage from '@/components/pages/MyCoursesPage';
+import FavoritesPage from '@/components/pages/FavoritesPage';
+import NotesPage from '@/components/pages/NotesPage';
 
 export const routes = {
   browse: {
@@ -9,28 +9,28 @@ export const routes = {
     label: 'Browse Courses',
     path: '/browse',
     icon: 'Search',
-    component: BrowseCourses
+component: BrowseCoursesPage
   },
   myCourses: {
     id: 'my-courses',
     label: 'My Courses',
     path: '/my-courses',
     icon: 'BookOpen',
-    component: MyCourses
+component: MyCoursesPage
   },
   favorites: {
     id: 'favorites',
     label: 'Favorites',
     path: '/favorites',
     icon: 'Heart',
-    component: Favorites
+component: FavoritesPage
   },
   notes: {
     id: 'notes',
     label: 'Notes',
     path: '/notes',
     icon: 'FileText',
-    component: Notes
+component: NotesPage
   }
 };
 

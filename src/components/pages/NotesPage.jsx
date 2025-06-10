@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { format } from 'date-fns';
-import ApperIcon from '../components/ApperIcon';
-import { courseService, userProgressService } from '../services';
+import ApperIcon from '@/components/ApperIcon';
+import { courseService, userProgressService } from '@/services';
+import SearchInput from '@/components/molecules/SearchInput';
+import FilterSelect from '@/components/molecules/FilterSelect';
+import NotesList from '@/components/organisms/NotesList';
+import Button from '@/components/atoms/Button';
+import Text from '@/components/atoms/Text';
 
-function Notes() {
+function NotesPage() {
   const [courses, setCourses] = useState([]);
   const [userProgress, setUserProgress] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,12 +40,11 @@ function Notes() {
     loadData();
   }, []);
 
-  // Get all notes from all courses
+  // Get all notes from all courses and enrich them
   const allNotes = userProgress.reduce((acc, progress) => {
     const course = courses.find(c => c.id === progress.courseId);
     if (course && progress.notes) {
       progress.notes.forEach(note => {
-        // Find the lesson for this note
         let lesson = null;
         for (const module of course.modules) {
           const foundLesson = module.lessons.find(l => l.id === note.lessonId);
@@ -85,7 +88,7 @@ function Notes() {
     )
   );
 
-  const deleteNote = async (noteId, courseId) => {
+  const handleDeleteNote = async (noteId, courseId) => {
     try {
       const progress = userProgress.find(p => p.courseId === courseId);
       if (progress) {
@@ -106,8 +109,13 @@ function Notes() {
     }
   };
 
-  const goToLesson = (courseId, lessonId) => {
+  const handleGoToLesson = (courseId, lessonId) => {
     navigate(`/course/${courseId}/lesson/${lessonId}`);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedCourse('');
   };
 
   if (loading) {
@@ -135,14 +143,14 @@ function Notes() {
     return (
       <div className="text-center py-12">
         <ApperIcon name="AlertCircle" className="w-16 h-16 text-error mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to load notes</h3>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button
+        <Text as="h3" className="text-lg font-medium text-gray-900 mb-2">Unable to load notes</Text>
+        <Text as="p" className="text-gray-600 mb-4">{error}</Text>
+        <Button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
         >
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -160,16 +168,16 @@ function Notes() {
         >
           <ApperIcon name="FileText" className="w-16 h-16 text-gray-300 mx-auto" />
         </motion.div>
-        <h3 className="mt-4 text-lg font-medium text-gray-900">No notes yet</h3>
-        <p className="mt-2 text-gray-600 mb-6">Start taking notes while learning to keep track of important insights</p>
-        <motion.button
+        <Text as="h3" className="mt-4 text-lg font-medium text-gray-900">No notes yet</Text>
+        <Text as="p" className="mt-2 text-gray-600 mb-6">Start taking notes while learning to keep track of important insights</Text>
+        <Button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/browse')}
           className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
         >
           Start Learning
-        </motion.button>
+        </Button>
       </motion.div>
     );
   }
@@ -179,140 +187,54 @@ function Notes() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-gray-900">My Notes</h1>
-          <p className="text-gray-600 mt-1">
+          <Text as="h1" className="text-2xl font-heading font-bold text-gray-900">My Notes</Text>
+          <Text as="p" className="text-gray-600 mt-1">
             {sortedNotes.length} note{sortedNotes.length !== 1 ? 's' : ''} across {coursesWithNotes.length} course{coursesWithNotes.length !== 1 ? 's' : ''}
-          </p>
+          </Text>
         </div>
         
         <div className="flex items-center space-x-2 text-primary">
           <ApperIcon name="FileText" className="w-5 h-5" />
-          <span className="font-medium">{allNotes.length} Total Notes</span>
+          <Text as="span" className="font-medium">{allNotes.length} Total Notes</Text>
         </div>
       </div>
 
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Search */}
-        <div className="relative">
-          <ApperIcon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search notes..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
-        </div>
+        <SearchInput 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search notes..."
+          className="relative"
+        />
 
-        {/* Course Filter */}
-        <select
+        <FilterSelect
           value={selectedCourse}
           onChange={(e) => setSelectedCourse(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-        >
-          <option value="">All Courses</option>
-          {coursesWithNotes.map(course => (
-            <option key={course.id} value={course.id}>{course.title}</option>
-          ))}
-        </select>
+          options={coursesWithNotes.map(course => ({ value: course.id, label: course.title }))}
+          defaultValue="All Courses"
+        />
       </div>
 
-      {/* Clear Filters */}
       {(searchTerm || selectedCourse) && (
-        <button
-          onClick={() => {
-            setSearchTerm('');
-            setSelectedCourse('');
-          }}
+        <Button
+          onClick={clearFilters}
           className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Clear Filters
-        </button>
+        </Button>
       )}
 
-      {/* Notes List */}
-      {sortedNotes.length === 0 ? (
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="text-center py-12"
-        >
-          <ApperIcon name="Search" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No notes found</h3>
-          <p className="text-gray-600 mb-4">Try adjusting your search criteria</p>
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setSelectedCourse('');
-            }}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Show All Notes
-          </button>
-        </motion.div>
-      ) : (
-        <div className="space-y-4">
-          {sortedNotes.map((note, index) => (
-            <motion.div
-              key={note.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                      {note.courseName}
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-sm text-gray-600 break-words">
-                      {note.lessonName}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {format(new Date(note.updatedAt), 'MMM dd, yyyy • h:mm a')}
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => goToLesson(note.courseId, note.lessonId)}
-                    className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                    title="Go to lesson"
-                  >
-                    <ApperIcon name="ExternalLink" className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteNote(note.id, note.courseId)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete note"
-                  >
-                    <ApperIcon name="Trash2" className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              
-              <div 
-                className="prose prose-sm max-w-none text-gray-700 break-words"
-                dangerouslySetInnerHTML={{ 
-                  __html: note.content.replace(/\n/g, '<br>') 
-                }}
-              />
-            </motion.div>
-          ))}
-        </div>
-      )}
-      
-      {sortedNotes.length > 0 && (
-        <div className="text-center text-gray-600">
-          Showing {sortedNotes.length} of {allNotes.length} notes
-        </div>
-      )}
+      <NotesList 
+        notes={sortedNotes} 
+        onDeleteNote={handleDeleteNote} 
+        onGoToLesson={handleGoToLesson} 
+        allNotesCount={allNotes.length}
+        filteredNotesCount={sortedNotes.length}
+        showEmptyState={true}
+      />
     </div>
   );
 }
 
-export default Notes;
+export default NotesPage;
