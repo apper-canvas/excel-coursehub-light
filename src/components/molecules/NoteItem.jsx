@@ -18,9 +18,13 @@ const NoteItem = ({ note, onDelete, onGoToLesson }) => {
                     <ApperIcon name="Trash2" className="w-3 h-3" />
                 </Button>
             </div>
-            <div 
+<div 
                 className="text-gray-700 text-sm break-words"
-                dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+                dangerouslySetInnerHTML={{ 
+                    __html: note.content
+                        .replace(/\n/g, '<br>')
+                        .replace(/<span class="highlight-(\w+)"[^>]*>/g, '<span class="highlight-$1">')
+                }}
             />
         </div>
     );

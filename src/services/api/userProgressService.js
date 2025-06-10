@@ -138,9 +138,19 @@ const userProgressService = {
       throw new Error('Note not found');
     }
     
+// Clean up content for storage - preserve highlights but sanitize
+    const cleanContent = noteData.content 
+      ? noteData.content
+          .replace(/<div>/g, '\n')
+          .replace(/<\/div>/g, '')
+          .replace(/<br\s*\/?>/g, '\n')
+          .replace(/&nbsp;/g, ' ')
+      : noteData.content;
+    
     progress.notes[noteIndex] = {
       ...progress.notes[noteIndex],
       ...noteData,
+      content: cleanContent || progress.notes[noteIndex].content,
       updatedAt: new Date()
     };
     

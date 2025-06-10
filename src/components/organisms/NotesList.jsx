@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import NoteItem from '@/components/molecules/NoteItem';
 import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 import Text from '@/components/atoms/Text';
-
 const NotesList = ({ 
   notes, 
   onDeleteNote, 
@@ -116,6 +115,199 @@ const NotesList = ({
                     Showing {filteredNotesCount} of {allNotesCount} notes
                 </div>
             )}
+        </div>
+    );
+};
+
+const NoteEditor = ({ 
+    note, 
+    editContent, 
+    onEditContentChange, 
+    onSaveNote, 
+    onCancelEdit 
+}) => {
+    const [selectedColor, setSelectedColor] = useState('yellow');
+    const [isSaving, setIsSaving] = useState(false);
+    const editorRef = useRef(null);
+    const [showHighlightToolbar, setShowHighlightToolbar] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+                e.preventDefault();
+                handleHighlight(selectedColor, getColorValue(selectedColor));
+            }
+        };
+
+        if (editorRef.current) {
+            editorRef.current.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            if (editorRef.current) {
+                editorRef.current.removeEventListener('keydown', handleKeyDown);
+            }
+        };
+    }, [selectedColor]);
+
+    useEffect(() => {
+        const handleSelection = () => {
+            const selection = window.getSelection();
+            setShowHighlightToolbar(selection.toString().length > 0);
+        };
+
+        document.addEventListener('selectionchange', handleSelection);
+        return () => document.removeEventListener('selectionchange', handleSelection);
+    }, []);
+
+    const getColorValue = (colorName) => {
+        const colorMap = {
+            yellow: '#fef3c7',
+            green: '#d1fae5',
+            blue: '#dbeafe',
+            pink: '#fce7f3',
+            orange: '#ffedd5'
+        };
+        return colorMap[colorName] || '#fef3c7';
+    };
+
+    const handleHighlight = (colorName, colorValue) => {
+        const selection = window.getSelection();
+        if (selection.rangeCount === 0 || selection.toString().length === 0) return;
+
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        
+        // Create highlight span
+        const highlightSpan = document.createElement('span');
+        highlightSpan.className = colorName === 'custom' ? 'highlight-custom' : `highlight-${colorName}`;
+        if (colorName === 'custom') {
+            highlightSpan.style.backgroundColor = colorValue;
+        }
+        highlightSpan.textContent = selectedText;
+        
+        // Replace selection with highlighted span
+        range.deleteContents();
+        range.insertNode(highlightSpan);
+        
+        // Update content
+        if (editorRef.current) {
+            const newContent = editorRef.current.innerHTML;
+            onEditContentChange(newContent);
+        }
+        
+        // Clear selection
+        selection.removeAllRanges();
+        setShowHighlightToolbar(false);
+    };
+
+    const handleRemoveHighlight = () => {
+        const selection = window.getSelection();
+        if (selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+        const container = range.commonAncestorContainer;
+        
+        // Find highlight spans within selection
+let element = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
+
+if (element.classList && (element.classList.contains('highlight-yellow') || 
+element.classList.contains('highlight-green') ||
+element.classList.contains('highlight-blue') ||
+element.classList.contains('highlight-pink') ||
+element.classList.contains('highlight-orange') ||
+element.classList.contains('highlight-custom'))) {
+            // Replace highlighted span with its text content
+            const textNode = document.createTextNode(element.textContent);
+            element.parentNode.replaceChild(textNode, element);
+            
+            // Update content
+            if (editorRef.current) {
+                const newContent = editorRef.current.innerHTML;
+                onEditContentChange(newContent);
+            }
+        }
+        
+        selection.removeAllRanges();
+        setShowHighlightToolbar(false);
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await onSaveNote();
+        } catch (error) {
+            console.error('Failed to save note:', error);
+            // Error handling is done in parent component
+        } finally {
+            setIsSaving(false);
+        }
+    };
+return (
+<div className="space-y-4">
+{showHighlightToolbar && (
+<div className="mb-4 p-2 bg-gray-50 rounded-lg border">
+<div className="flex items-center space-x-2">
+<span className="text-sm text-gray-600">Highlight:</span>
+{['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
+<button
+key={color}
+onClick={() => handleHighlight(color, getColorValue(color))}
+className={`w-6 h-6 rounded border-2 ${selectedColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+style={{ backgroundColor: getColorValue(color) }}
+title={`Highlight with ${color}`}
+/>
+))}
+<button
+onClick={handleRemoveHighlight}
+className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+title="Remove highlight"
+>
+Remove
+</button>
+</div>
+</div>
+)}
+
+<div
+            <div
+                ref={editorRef}
+                contentEditable
+                className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor"
+                style={{ whiteSpace: 'pre-wrap' }}
+                dangerouslySetInnerHTML={{ __html: editContent }}
+                onInput={(e) => onEditContentChange(e.target.innerHTML)}
+                onBlur={() => setShowHighlightToolbar(false)}
+                placeholder="Edit your note..."
+            />
+            
+            <div className="flex items-center space-x-2">
+                <Button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                >
+                    {isSaving ? (
+                        <>
+                            <ApperIcon name="Loader2" className="w-4 h-4 mr-1 animate-spin" />
+                            Saving...
+                        </>
+                    ) : (
+                        <>
+                            <ApperIcon name="Check" className="w-4 h-4 mr-1" />
+                            Save
+                        </>
+                    )}
+                </Button>
+                <Button
+                    onClick={onCancelEdit}
+                    disabled={isSaving}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors text-sm"
+                >
+                    <ApperIcon name="X" className="w-4 h-4 mr-1" />
+                    Cancel
+                </Button>
+            </div>
         </div>
     );
 };
