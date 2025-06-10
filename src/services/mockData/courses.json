@@ -1,0 +1,462 @@
+[
+  {
+    "id": "1",
+    "title": "Complete React Development Bootcamp",
+    "description": "Master React from basics to advanced concepts. Build real-world applications using React hooks, context API, and modern development practices. Perfect for beginners and intermediate developers.",
+    "instructor": "Sarah Chen",
+    "category": "Web Development",
+    "thumbnail": "/images/react-course.jpg",
+    "duration": 24,
+    "difficulty": "Intermediate",
+    "modules": [
+      {
+        "id": "mod1",
+        "title": "React Fundamentals",
+        "description": "Learn the core concepts of React including components, JSX, and props",
+        "order": 1,
+        "lessons": [
+          {
+            "id": "1",
+            "title": "Introduction to React",
+            "content": "React is a powerful JavaScript library for building user interfaces. It was created by Facebook and has revolutionized how we think about web development.\n\nKey features of React:\n• Component-based architecture\n• Virtual DOM for performance\n• Unidirectional data flow\n• Large ecosystem and community\n\nIn this lesson, we'll explore why React has become so popular and how it differs from traditional web development approaches. React allows us to build complex UIs by composing small, reusable components.",
+            "videoUrl": "https://example.com/react-intro.mp4",
+            "duration": 45,
+            "order": 1,
+            "resources": [
+              {
+                "id": "res1",
+                "title": "React Official Documentation",
+                "type": "pdf",
+                "url": "https://example.com/react-docs.pdf",
+                "size": 2048000
+              },
+              {
+                "id": "res2",
+                "title": "Component Examples",
+                "type": "slides",
+                "url": "https://example.com/components.pptx",
+                "size": 1536000
+              }
+            ]
+          },
+          {
+            "id": "2",
+            "title": "JSX and Components",
+            "content": "JSX (JavaScript XML) is a syntax extension for JavaScript that allows us to write HTML-like code within our JavaScript files. It's one of React's most distinctive features.\n\nJSX Benefits:\n• Familiar HTML-like syntax\n• JavaScript expressions embedded with {}\n• Type safety with TypeScript\n• Better developer experience\n\nComponents are the building blocks of React applications. Every piece of UI in React is a component, from simple buttons to complex forms and entire pages.",
+            "videoUrl": "https://example.com/jsx-components.mp4",
+            "duration": 52,
+            "order": 2,
+            "resources": [
+              {
+                "id": "res3",
+                "title": "JSX Cheat Sheet",
+                "type": "pdf",
+                "url": "https://example.com/jsx-cheat.pdf",
+                "size": 512000
+              }
+            ]
+          },
+          {
+            "id": "3",
+            "title": "Props and State",
+            "content": "Props (properties) are how components communicate with each other. They allow parent components to pass data down to child components, creating a unidirectional data flow.\n\nState represents data that can change over time. When state changes, React automatically re-renders the component to reflect the new data.\n\nKey concepts:\n• Props are read-only\n• State should be immutable\n• Use useState hook for functional components\n• Lift state up when needed\n\nUnderstanding props and state is crucial for building interactive React applications.",
+            "videoUrl": "https://example.com/props-state.mp4",
+            "duration": 38,
+            "order": 3,
+            "resources": [
+              {
+                "id": "res4",
+                "title": "State Management Examples",
+                "type": "video",
+                "url": "https://example.com/state-examples.mp4",
+                "size": 5242880
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mod2",
+        "title": "React Hooks",
+        "description": "Deep dive into React hooks and modern functional component patterns",
+        "order": 2,
+        "lessons": [
+          {
+            "id": "4",
+            "title": "useState and useEffect",
+            "content": "React Hooks revolutionized how we write React components. They allow us to use state and lifecycle methods in functional components.\n\nuseState:\n• Manages component state\n• Returns current state and setter function\n• Can hold any type of value\n• Multiple useState calls are allowed\n\nuseEffect:\n• Handles side effects\n• Replaces componentDidMount, componentDidUpdate, and componentWillUnmount\n• Can have cleanup functions\n• Dependency array controls when it runs\n\nThese two hooks cover most common component needs and form the foundation of modern React development.",
+            "videoUrl": "https://example.com/hooks-basics.mp4",
+            "duration": 41,
+            "order": 4,
+            "resources": [
+              {
+                "id": "res5",
+                "title": "Hooks Reference Guide",
+                "type": "pdf",
+                "url": "https://example.com/hooks-guide.pdf",
+                "size": 1024000
+              }
+            ]
+          },
+          {
+            "id": "5",
+            "title": "Custom Hooks",
+            "content": "Custom hooks are JavaScript functions that start with 'use' and can call other hooks. They allow us to extract and reuse stateful logic between components.\n\nBenefits of custom hooks:\n• Code reusability\n• Separation of concerns\n• Easier testing\n• Cleaner components\n\nCommon patterns:\n• Data fetching hooks\n• Form handling hooks\n• Local storage hooks\n• API integration hooks\n\nCustom hooks are one of React's most powerful features for creating maintainable applications.",
+            "videoUrl": "https://example.com/custom-hooks.mp4",
+            "duration": 35,
+            "order": 5,
+            "resources": [
+              {
+                "id": "res6",
+                "title": "Custom Hook Examples",
+                "type": "slides",
+                "url": "https://example.com/custom-hooks.pptx",
+                "size": 2048000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mod3",
+        "title": "Advanced React Patterns",
+        "description": "Learn advanced patterns and best practices for scalable React applications",
+        "order": 3,
+        "lessons": [
+          {
+            "id": "6",
+            "title": "Context API and Global State",
+            "content": "The Context API provides a way to share data across components without prop drilling. It's perfect for global state like user authentication, themes, and application settings.\n\nContext concepts:\n• Provider component supplies data\n• Consumer components access data\n• useContext hook for functional components\n• Multiple contexts can be used together\n\nBest practices:\n• Don't overuse context\n• Split contexts by concern\n• Provide default values\n• Consider performance implications\n\nContext is ideal for data that many components need access to.",
+            "videoUrl": "https://example.com/context-api.mp4",
+            "duration": 43,
+            "order": 6,
+            "resources": [
+              {
+                "id": "res7",
+                "title": "Context Patterns",
+                "type": "pdf",
+                "url": "https://example.com/context-patterns.pdf",
+                "size": 1536000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Advanced JavaScript ES6+",
+    "description": "Deep dive into modern JavaScript features including ES6, ES7, ES8 and beyond. Learn arrow functions, destructuring, async/await, modules, and advanced programming techniques.",
+    "instructor": "Michael Rodriguez",
+    "category": "Programming",
+    "thumbnail": "/images/javascript-course.jpg",
+    "duration": 18,
+    "difficulty": "Advanced",
+    "modules": [
+      {
+        "id": "mod4",
+        "title": "ES6 Fundamentals",
+        "description": "Master the foundational features introduced in ES6",
+        "order": 1,
+        "lessons": [
+          {
+            "id": "10",
+            "title": "Arrow Functions and Template Literals",
+            "content": "ES6 introduced arrow functions, which provide a more concise syntax for writing functions and have different 'this' binding behavior.\n\nArrow function benefits:\n• Shorter syntax\n• Lexical 'this' binding\n• Implicit return for single expressions\n• No arguments object\n\nTemplate literals revolutionize string handling:\n• Multi-line strings\n• Expression interpolation with ${}\n• Tagged template literals\n• No more string concatenation\n\nThese features make JavaScript code more readable and maintainable.",
+            "videoUrl": "https://example.com/arrow-functions.mp4",
+            "duration": 39,
+            "order": 1,
+            "resources": [
+              {
+                "id": "res8",
+                "title": "ES6 Quick Reference",
+                "type": "pdf",
+                "url": "https://example.com/es6-reference.pdf",
+                "size": 1024000
+              }
+            ]
+          },
+          {
+            "id": "11",
+            "title": "Destructuring and Spread Operator",
+            "content": "Destructuring allows us to extract values from arrays and objects into distinct variables. It's a powerful feature that makes code more readable and concise.\n\nArray destructuring:\n• Extract elements by position\n• Skip elements with commas\n• Default values\n• Rest elements with ...\n\nObject destructuring:\n• Extract properties by name\n• Rename variables\n• Nested destructuring\n• Computed property names\n\nThe spread operator (...) allows iteration over arrays and objects, making it easy to copy, combine, and manipulate data structures.",
+            "videoUrl": "https://example.com/destructuring.mp4",
+            "duration": 44,
+            "order": 2,
+            "resources": [
+              {
+                "id": "res9",
+                "title": "Destructuring Patterns",
+                "type": "slides",
+                "url": "https://example.com/destructuring.pptx",
+                "size": 2560000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mod5",
+        "title": "Asynchronous JavaScript",
+        "description": "Master promises, async/await, and modern asynchronous programming patterns",
+        "order": 2,
+        "lessons": [
+          {
+            "id": "12",
+            "title": "Promises and Async/Await",
+            "content": "Asynchronous programming is crucial for modern web development. Promises provide a cleaner alternative to callbacks, while async/await makes asynchronous code look synchronous.\n\nPromise states:\n• Pending - initial state\n• Fulfilled - operation completed successfully\n• Rejected - operation failed\n\nAsync/await benefits:\n• Cleaner syntax than .then() chains\n• Better error handling with try/catch\n• Easier debugging\n• More readable code flow\n\nMastering these concepts is essential for handling API calls, file operations, and other asynchronous tasks.",
+            "videoUrl": "https://example.com/async-await.mp4",
+            "duration": 47,
+            "order": 3,
+            "resources": [
+              {
+                "id": "res10",
+                "title": "Async Patterns Guide",
+                "type": "pdf",
+                "url": "https://example.com/async-guide.pdf",
+                "size": 1792000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Python for Data Science",
+    "description": "Learn Python programming specifically for data science applications. Covers pandas, NumPy, matplotlib, machine learning basics, and data visualization techniques.",
+    "instructor": "Dr. Emily Watson",
+    "category": "Data Science",
+    "thumbnail": "/images/python-course.jpg",
+    "duration": 32,
+    "difficulty": "Beginner",
+    "modules": [
+      {
+        "id": "mod6",
+        "title": "Python Basics for Data Science",
+        "description": "Essential Python concepts and data structures for data science",
+        "order": 1,
+        "lessons": [
+          {
+            "id": "7",
+            "title": "Python Data Structures",
+            "content": "Python provides several built-in data structures that are essential for data science work. Understanding these structures is crucial for effective data manipulation.\n\nKey data structures:\n• Lists - ordered, mutable collections\n• Tuples - ordered, immutable collections\n• Dictionaries - key-value pairs\n• Sets - unordered collections of unique elements\n\nList operations:\n• Indexing and slicing\n• Append, insert, remove\n• List comprehensions\n• Sorting and searching\n\nDictionaries are particularly important in data science for representing structured data and mapping relationships.",
+            "videoUrl": "https://example.com/python-structures.mp4",
+            "duration": 42,
+            "order": 1,
+            "resources": [
+              {
+                "id": "res11",
+                "title": "Python Data Structures Cheat Sheet",
+                "type": "pdf",
+                "url": "https://example.com/python-structures.pdf",
+                "size": 768000
+              }
+            ]
+          },
+          {
+            "id": "8",
+            "title": "NumPy Arrays and Operations",
+            "content": "NumPy is the foundation of the Python data science ecosystem. It provides efficient array operations and mathematical functions essential for numerical computing.\n\nNumPy advantages:\n• Vectorized operations\n• Memory efficiency\n• Broadcasting capabilities\n• Integration with other libraries\n\nCommon operations:\n• Array creation and indexing\n• Mathematical operations\n• Array reshaping and slicing\n• Statistical functions\n• Linear algebra operations\n\nNumPy arrays are much faster than Python lists for numerical operations and form the basis for pandas DataFrames.",
+            "videoUrl": "https://example.com/numpy-arrays.mp4",
+            "duration": 48,
+            "order": 2,
+            "resources": [
+              {
+                "id": "res12",
+                "title": "NumPy Quick Reference",
+                "type": "pdf",
+                "url": "https://example.com/numpy-reference.pdf",
+                "size": 1280000
+              }
+            ]
+          },
+          {
+            "id": "9",
+            "title": "Pandas DataFrames",
+            "content": "Pandas is the go-to library for data manipulation and analysis in Python. DataFrames provide a powerful way to work with structured data.\n\nDataFrame features:\n• Labeled rows and columns\n• Heterogeneous data types\n• Missing data handling\n• Powerful indexing\n• Built-in data analysis tools\n\nCommon operations:\n• Loading data from files\n• Filtering and selecting data\n• Grouping and aggregation\n• Merging and joining\n• Data cleaning and transformation\n\nPandas makes data analysis intuitive and efficient, handling much of the complexity behind the scenes.",
+            "videoUrl": "https://example.com/pandas-dataframes.mp4",
+            "duration": 51,
+            "order": 3,
+            "resources": [
+              {
+                "id": "res13",
+                "title": "Pandas Operations Guide",
+                "type": "pdf",
+                "url": "https://example.com/pandas-guide.pdf",
+                "size": 2048000
+              },
+              {
+                "id": "res14",
+                "title": "Sample Datasets",
+                "type": "zip",
+                "url": "https://example.com/datasets.zip",
+                "size": 5120000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mod7",
+        "title": "Data Visualization",
+        "description": "Create compelling visualizations using matplotlib and seaborn",
+        "order": 2,
+        "lessons": [
+          {
+            "id": "13",
+            "title": "Matplotlib Fundamentals",
+            "content": "Matplotlib is Python's primary plotting library, providing a MATLAB-like interface for creating static, animated, and interactive visualizations.\n\nCore concepts:\n• Figure and axes objects\n• Plot types and customization\n• Subplots and layouts\n• Styling and themes\n\nCommon plot types:\n• Line plots for trends\n• Scatter plots for relationships\n• Bar charts for categories\n• Histograms for distributions\n• Box plots for statistical summaries\n\nMatplotlib's flexibility allows for highly customized visualizations, though it requires more code than some alternatives.",
+            "videoUrl": "https://example.com/matplotlib-basics.mp4",
+            "duration": 45,
+            "order": 4,
+            "resources": [
+              {
+                "id": "res15",
+                "title": "Matplotlib Gallery",
+                "type": "pdf",
+                "url": "https://example.com/matplotlib-gallery.pdf",
+                "size": 3072000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "title": "UI/UX Design Fundamentals",
+    "description": "Master the principles of user interface and user experience design. Learn design thinking, prototyping, user research, and modern design tools and methodologies.",
+    "instructor": "Alex Kim",
+    "category": "Design",
+    "thumbnail": "/images/design-course.jpg",
+    "duration": 20,
+    "difficulty": "Beginner",
+    "modules": [
+      {
+        "id": "mod8",
+        "title": "Design Principles",
+        "description": "Fundamental principles that guide effective UI/UX design",
+        "order": 1,
+        "lessons": [
+          {
+            "id": "14",
+            "title": "Visual Hierarchy and Typography",
+            "content": "Visual hierarchy guides users through your design by establishing the order of importance. Typography is a crucial component that affects both readability and the overall user experience.\n\nVisual hierarchy principles:\n• Size and scale to show importance\n• Color and contrast for emphasis\n• Spacing and grouping for organization\n• Alignment for structure\n\nTypography fundamentals:\n• Font families and their personalities\n• Font size and line height\n• Letter spacing and word spacing\n• Hierarchy through font weight and style\n\nGood typography is invisible - it shouldn't distract from the content but should enhance readability and comprehension.",
+            "videoUrl": "https://example.com/visual-hierarchy.mp4",
+            "duration": 38,
+            "order": 1,
+            "resources": [
+              {
+                "id": "res16",
+                "title": "Typography Guidelines",
+                "type": "pdf",
+                "url": "https://example.com/typography-guide.pdf",
+                "size": 1536000
+              }
+            ]
+          },
+          {
+            "id": "15",
+            "title": "Color Theory and Psychology",
+            "content": "Color is one of the most powerful tools in a designer's arsenal. It can evoke emotions, guide attention, and communicate brand personality.\n\nColor theory basics:\n• Primary, secondary, and tertiary colors\n• Color harmonies (complementary, analogous, triadic)\n• Saturation, brightness, and hue\n• Color temperature and mood\n\nColor psychology:\n• Red: energy, urgency, passion\n• Blue: trust, calm, professional\n• Green: nature, growth, harmony\n• Yellow: optimism, creativity, attention\n\nAccessibility considerations:\n• Color contrast ratios\n• Color blindness accommodation\n• Cultural color associations\n• Don't rely on color alone for meaning",
+            "videoUrl": "https://example.com/color-theory.mp4",
+            "duration": 41,
+            "order": 2,
+            "resources": [
+              {
+                "id": "res17",
+                "title": "Color Palette Generator",
+                "type": "tool",
+                "url": "https://example.com/color-tool",
+                "size": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "mod9",
+        "title": "User Experience Design",
+        "description": "Learn user-centered design processes and methodologies",
+        "order": 2,
+        "lessons": [
+          {
+            "id": "16",
+            "title": "User Research and Personas",
+            "content": "User research is the foundation of good UX design. It helps us understand user needs, behaviors, and pain points before we start designing solutions.\n\nResearch methods:\n• User interviews for qualitative insights\n• Surveys for quantitative data\n• Usability testing for validation\n• Analytics for behavioral patterns\n• Card sorting for information architecture\n\nPersonas are fictional characters based on real user research. They help teams:\n• Stay focused on user needs\n• Make design decisions\n• Communicate user requirements\n• Prioritize features\n\nEffective personas include demographics, goals, frustrations, behaviors, and scenarios that represent your actual users.",
+            "videoUrl": "https://example.com/user-research.mp4",
+            "duration": 44,
+            "order": 3,
+            "resources": [
+              {
+                "id": "res18",
+                "title": "Persona Template",
+                "type": "pdf",
+                "url": "https://example.com/persona-template.pdf",
+                "size": 512000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "title": "Machine Learning with TensorFlow",
+    "description": "Comprehensive introduction to machine learning using TensorFlow. Build neural networks, understand deep learning concepts, and create practical AI applications.",
+    "instructor": "Dr. James Liu",
+    "category": "Machine Learning",
+    "thumbnail": "/images/ml-course.jpg",
+    "duration": 40,
+    "difficulty": "Advanced",
+    "modules": [
+      {
+        "id": "mod10",
+        "title": "Machine Learning Foundations",
+        "description": "Core concepts and mathematical foundations of machine learning",
+        "order": 1,
+        "lessons": [
+          {
+            "id": "17",
+            "title": "Introduction to Neural Networks",
+            "content": "Neural networks are the foundation of modern machine learning. Inspired by biological neurons, they can learn complex patterns from data.\n\nKey concepts:\n• Neurons (nodes) and connections (weights)\n• Layers: input, hidden, and output\n• Activation functions (ReLU, sigmoid, tanh)\n• Forward propagation\n• Backpropagation and gradient descent\n\nNetwork architecture:\n• Feedforward networks for basic classification\n• Convolutional networks for image processing\n• Recurrent networks for sequences\n• Transformer networks for attention\n\nTensorFlow provides high-level APIs that make building neural networks accessible while still allowing for advanced customization.",
+            "videoUrl": "https://example.com/neural-networks.mp4",
+            "duration": 52,
+            "order": 1,
+            "resources": [
+              {
+                "id": "res19",
+                "title": "Neural Network Diagrams",
+                "type": "pdf",
+                "url": "https://example.com/nn-diagrams.pdf",
+                "size": 2048000
+              }
+            ]
+          },
+          {
+            "id": "18",
+            "title": "TensorFlow Basics",
+            "content": "TensorFlow is Google's open-source machine learning platform. It provides comprehensive tools for building and deploying ML models at scale.\n\nCore components:\n• Tensors - multi-dimensional arrays\n• Operations - mathematical computations\n• Graphs - computational workflows\n• Sessions - execution environments\n\nKeras integration:\n• High-level API for rapid prototyping\n• Pre-built layers and models\n• Easy model compilation and training\n• Extensive documentation and community\n\nTensorFlow 2.x features:\n• Eager execution by default\n• Simplified API design\n• Better debugging capabilities\n• Improved production deployment",
+            "videoUrl": "https://example.com/tensorflow-basics.mp4",
+            "duration": 46,
+            "order": 2,
+            "resources": [
+              {
+                "id": "res20",
+                "title": "TensorFlow Installation Guide",
+                "type": "pdf",
+                "url": "https://example.com/tf-install.pdf",
+                "size": 1024000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
