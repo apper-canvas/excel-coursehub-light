@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 import NoteItem from '@/components/molecules/NoteItem';
 import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
