@@ -110,39 +110,13 @@ const NoteEditor = ({
     onCancelEdit 
 }) => {
     const [selectedColor, setSelectedColor] = useState('yellow');
-const [isSaving, setIsSaving] = useState(false);
-    const editorRef = useRef(null);
-    const [showHighlightToolbar, setShowHighlightToolbar] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
     const [hasSelection, setHasSelection] = useState(false);
+    const [selectionPosition, setSelectionPosition] = useState(null);
+    const [showContextMenu, setShowContextMenu] = useState(false);
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const editorRef = useRef(null);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'H') {
-                e.preventDefault();
-                handleHighlight(selectedColor, getColorValue(selectedColor));
-            }
-        };
-
-        if (editorRef.current) {
-            editorRef.current.addEventListener('keydown', handleKeyDown);
-        }
-
-        return () => {
-            if (editorRef.current) {
-                editorRef.current.removeEventListener('keydown', handleKeyDown);
-            }
-        };
-    }, [selectedColor]);
-
-    useEffect(() => {
-        const handleSelection = () => {
-            const selection = window.getSelection();
-            setHasSelection(selection.toString().length > 0);
-        };
-
-        document.addEventListener('selectionchange', handleSelection);
-        return () => document.removeEventListener('selectionchange', handleSelection);
-    }, []);
     const getColorValue = (colorName) => {
         const colorMap = {
             yellow: '#fef3c7',
@@ -154,7 +128,7 @@ const [isSaving, setIsSaving] = useState(false);
         return colorMap[colorName] || '#fef3c7';
     };
 
-    const handleHighlight = (colorName, colorValue) => {
+    const handleHighlight = (colorName) => {
         const selection = window.getSelection();
         if (selection.rangeCount === 0 || selection.toString().length === 0) return;
 
@@ -163,10 +137,7 @@ const [isSaving, setIsSaving] = useState(false);
         
         // Create highlight span
         const highlightSpan = document.createElement('span');
-        highlightSpan.className = colorName === 'custom' ? 'highlight-custom' : `highlight-${colorName}`;
-        if (colorName === 'custom') {
-            highlightSpan.style.backgroundColor = colorValue;
-        }
+        highlightSpan.className = `highlight-${colorName}`;
         highlightSpan.textContent = selectedText;
         
         // Replace selection with highlighted span
@@ -179,9 +150,11 @@ const [isSaving, setIsSaving] = useState(false);
             onEditContentChange(newContent);
         }
         
-// Clear selection
+        // Clear selection and hide toolbars
         selection.removeAllRanges();
         setHasSelection(false);
+        setSelectionPosition(null);
+        setShowContextMenu(false);
     };
 
     const handleRemoveHighlight = () => {
@@ -191,28 +164,29 @@ const [isSaving, setIsSaving] = useState(false);
         const range = selection.getRangeAt(0);
         const container = range.commonAncestorContainer;
         
-        // Find highlight spans within selection
-let element = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
+        let element = container.nodeType === Node.TEXT_NODE ? container.parentNode : container;
 
-if (element.classList && (element.classList.contains('highlight-yellow') || 
-element.classList.contains('highlight-green') ||
-element.classList.contains('highlight-blue') ||
-element.classList.contains('highlight-pink') ||
-element.classList.contains('highlight-orange') ||
-element.classList.contains('highlight-custom'))) {
-            // Replace highlighted span with its text content
+        if (element.classList && (
+            element.classList.contains('highlight-yellow') || 
+            element.classList.contains('highlight-green') ||
+            element.classList.contains('highlight-blue') ||
+            element.classList.contains('highlight-pink') ||
+            element.classList.contains('highlight-orange') ||
+            element.classList.contains('highlight-custom')
+        )) {
             const textNode = document.createTextNode(element.textContent);
             element.parentNode.replaceChild(textNode, element);
             
-            // Update content
             if (editorRef.current) {
                 const newContent = editorRef.current.innerHTML;
-onEditContentChange(newContent);
+                onEditContentChange(newContent);
             }
         }
         
         selection.removeAllRanges();
         setHasSelection(false);
+        setSelectionPosition(null);
+        setShowContextMenu(false);
     };
 
     const handleSave = async () => {
@@ -221,69 +195,186 @@ onEditContentChange(newContent);
             await onSaveNote();
         } catch (error) {
             console.error('Failed to save note:', error);
-            // Error handling is done in parent component
         } finally {
             setIsSaving(false);
         }
     };
-return (
+
+    // Handle text selection for floating toolbar
+    useEffect(() => {
+        const handleSelection = () => {
+            const selection = window.getSelection();
+            const hasText = selection.toString().length > 0;
+            
+            if (hasText && editorRef.current && editorRef.current.contains(selection.anchorNode)) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                const editorRect = editorRef.current.getBoundingClientRect();
+                
+                setSelectionPosition({
+                    x: rect.left + (rect.width / 2) - editorRect.left,
+                    y: rect.top - editorRect.top
+                });
+                setHasSelection(true);
+            } else {
+                setHasSelection(false);
+                setSelectionPosition(null);
+            }
+        };
+
+        document.addEventListener('selectionchange', handleSelection);
+        return () => document.removeEventListener('selectionchange', handleSelection);
+    }, []);
+
+    // Handle keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.ctrlKey && e.shiftKey) {
+                if (e.key === 'H') {
+                    e.preventDefault();
+                    if (hasSelection) {
+                        handleHighlight(selectedColor);
+                    }
+                } else if (e.key === 'R') {
+                    e.preventDefault();
+                    if (hasSelection) {
+                        handleRemoveHighlight();
+                    }
+                }
+            }
+        };
+
+        if (editorRef.current) {
+            editorRef.current.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            if (editorRef.current) {
+                editorRef.current.removeEventListener('keydown', handleKeyDown);
+            }
+        };
+    }, [selectedColor, hasSelection]);
+
+    // Handle right-click context menu
+    const handleContextMenu = (e) => {
+        const selection = window.getSelection();
+        if (selection.toString().length > 0) {
+            e.preventDefault();
+            setContextMenuPosition({ x: e.clientX, y: e.clientY });
+            setShowContextMenu(true);
+        }
+    };
+
+    // Close context menu on click outside
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setShowContextMenu(false);
+        };
+
+        if (showContextMenu) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [showContextMenu]);
+
+    return (
         <div className="space-y-4">
-            {/* Highlight Toolbar - Always visible when editing */}
-            <div className="p-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/20 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                        <ApperIcon name="Highlighter" className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium text-gray-700">Text Highlighter</span>
-                        {hasSelection && (
-                            <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                                Text Selected
-                            </span>
-                        )}
-                    </div>
-                    <span className="text-xs text-gray-500">Ctrl+Shift+H</span>
+            <div className="editor-container relative">
+                <div
+                    ref={editorRef}
+                    contentEditable
+                    className="w-full min-h-[160px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor bg-white shadow-sm editor-with-highlights"
+                    style={{ whiteSpace: 'pre-wrap' }}
+                    dangerouslySetInnerHTML={{ __html: editContent }}
+                    onInput={(e) => onEditContentChange(e.target.innerHTML)}
+                    onContextMenu={handleContextMenu}
+                    placeholder="Edit your note... (Select text to highlight)"
+                />
+
+                {/* Highlight indicator */}
+                <div className="highlight-indicator" title="Text highlighting enabled">
+                    <ApperIcon name="Highlighter" className="w-3 h-3" />
                 </div>
-                <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">Colors:</span>
-                    {['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
-                        <button
-                            key={color}
-                            onClick={() => {
-                                setSelectedColor(color);
-                                handleHighlight(color, getColorValue(color));
-                            }}
-                            className={`w-8 h-8 rounded-lg border-2 hover:scale-110 transition-all duration-200 ${
-                                selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 hover:border-gray-400'
-                            }`}
-                            style={{ backgroundColor: getColorValue(color) }}
-                            title={`Highlight with ${color}`}
-                            disabled={!hasSelection}
-                        />
-                    ))}
-                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                    <button
-                        onClick={handleRemoveHighlight}
-                        className="px-3 py-1.5 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
-                        title="Remove highlight from selected text"
-                        disabled={!hasSelection}
+
+                {/* Floating highlight toolbar */}
+                {hasSelection && selectionPosition && (
+                    <div 
+                        className="floating-highlight-toolbar"
+                        style={{
+                            left: `${selectionPosition.x}px`,
+                            top: `${selectionPosition.y}px`,
+                            transform: 'translateX(-50%)'
+                        }}
                     >
-                        <ApperIcon name="X" className="w-3 h-3 mr-1 inline" />
-                        Remove
-                    </button>
-                </div>
-                {!hasSelection && (
-                    <p className="text-xs text-gray-500 mt-2">Select text above to highlight it</p>
+                        <div className="mini-color-palette">
+                            {['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
+                                <button
+                                    key={color}
+                                    onClick={() => handleHighlight(color)}
+                                    className="mini-color-button"
+                                    style={{ backgroundColor: getColorValue(color) }}
+                                    title={`Highlight ${color}`}
+                                />
+                            ))}
+                        </div>
+                        <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                        <button
+                            onClick={handleRemoveHighlight}
+                            className="p-1 text-gray-600 hover:text-red-600 rounded transition-colors"
+                            title="Remove highlight"
+                        >
+                            <ApperIcon name="X" className="w-3 h-3" />
+                        </button>
+                    </div>
+                )}
+
+                {/* Context menu */}
+                {showContextMenu && (
+                    <div 
+                        className="highlight-context-menu"
+                        style={{
+                            left: `${contextMenuPosition.x}px`,
+                            top: `${contextMenuPosition.y}px`
+                        }}
+                    >
+                        <div className="context-menu-item" onClick={() => setShowContextMenu(false)}>
+                            <ApperIcon name="Highlighter" className="w-4 h-4 mr-2 text-primary" />
+                            <span className="text-sm font-medium">Highlight Selection</span>
+                        </div>
+                        <div className="context-menu-divider"></div>
+                        <div className="mini-color-palette p-2">
+                            {['yellow', 'green', 'blue', 'pink', 'orange'].map(color => (
+                                <button
+                                    key={color}
+                                    onClick={() => handleHighlight(color)}
+                                    className="mini-color-button"
+                                    style={{ backgroundColor: getColorValue(color) }}
+                                    title={`Highlight ${color}`}
+                                />
+                            ))}
+                        </div>
+                        <div className="context-menu-divider"></div>
+                        <div className="context-menu-item" onClick={handleRemoveHighlight}>
+                            <ApperIcon name="Eraser" className="w-4 h-4 mr-2 text-red-600" />
+                            <span className="text-sm">Remove Highlight</span>
+                        </div>
+                    </div>
                 )}
             </div>
 
-            <div
-                ref={editorRef}
-                contentEditable
-                className="w-full min-h-[120px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none note-editor bg-white shadow-sm"
-                style={{ whiteSpace: 'pre-wrap' }}
-                dangerouslySetInnerHTML={{ __html: editContent }}
-                onInput={(e) => onEditContentChange(e.target.innerHTML)}
-                placeholder="Edit your note..."
-            />
+            {/* Help text and keyboard shortcuts */}
+            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                    <span>💡 Select text to highlight it with the floating toolbar or right-click menu</span>
+                    <div className="flex items-center space-x-2">
+                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs">Ctrl+Shift+H</kbd>
+                        <span>Highlight</span>
+                        <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs">Ctrl+Shift+R</kbd>
+                        <span>Remove</span>
+                    </div>
+                </div>
+            </div>
+
             <div className="flex items-center space-x-2">
                 <Button
                     onClick={handleSave}

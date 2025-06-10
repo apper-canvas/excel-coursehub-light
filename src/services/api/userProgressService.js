@@ -145,6 +145,9 @@ const userProgressService = {
           .replace(/<\/div>/g, '')
           .replace(/<br\s*\/?>/g, '\n')
           .replace(/&nbsp;/g, ' ')
+          // Preserve highlight spans but clean up any malformed ones
+          .replace(/<span class="highlight-(\w+)"([^>]*)>/g, '<span class="highlight-$1">')
+          .replace(/<span class="highlight-custom"[^>]*style="background-color:\s*([^"]+)"[^>]*>/g, '<span class="highlight-custom" style="background-color: $1">')
       : noteData.content;
     
     progress.notes[noteIndex] = {

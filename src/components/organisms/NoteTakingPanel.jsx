@@ -7,6 +7,16 @@ import Card from '@/components/atoms/Card';
 import NoteItem from '@/components/molecules/NoteItem';
 
 const NoteTakingPanel = ({ noteContent, setNoteContent, onSaveNote, existingNotes, onDeleteNote, onGoToLesson }) => {
+    const handleHighlight = (content, color) => {
+        const selection = window.getSelection();
+        if (selection.toString().length > 0) {
+            const selectedText = selection.toString();
+            const highlightedText = `<span class="highlight-${color}">${selectedText}</span>`;
+            const newContent = content.replace(selectedText, highlightedText);
+            setNoteContent(newContent);
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -20,13 +30,24 @@ const NoteTakingPanel = ({ noteContent, setNoteContent, onSaveNote, existingNote
                 </Text>
                 
                 <div className="space-y-4">
-                    <Input
-                        as="textarea"
-                        value={noteContent}
-                        onChange={(e) => setNoteContent(e.target.value)}
-                        placeholder="Write your notes here..."
-                        className="h-32 p-3 resize-none"
-                    />
+                    <div className="relative">
+                        <textarea
+                            value={noteContent}
+                            onChange={(e) => setNoteContent(e.target.value)}
+                            placeholder="Write your notes here... (Select text and use Ctrl+Shift+H to highlight)"
+                            className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                            onKeyDown={(e) => {
+                                if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+                                    e.preventDefault();
+                                    handleHighlight(noteContent, 'yellow');
+                                }
+                            }}
+                        />
+                        <div className="absolute top-2 right-2 text-xs text-gray-400 flex items-center">
+                            <span className="mr-1">✨</span>
+                            <span>Highlighting enabled</span>
+                        </div>
+                    </div>
                     
                     <Button
                         onClick={onSaveNote}
