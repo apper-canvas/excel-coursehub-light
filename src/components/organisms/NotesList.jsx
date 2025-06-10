@@ -6,7 +6,19 @@ import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 import Text from '@/components/atoms/Text';
 
-const NotesList = ({ notes, onDeleteNote, onGoToLesson, showEmptyState = true, allNotesCount = 0, filteredNotesCount = 0 }) => {
+const NotesList = ({ 
+  notes, 
+  onDeleteNote, 
+  onEditNote,
+  editingNote,
+  editContent,
+  onEditContentChange,
+  onSaveNote,
+  onCancelEdit,
+  showEmptyState = true, 
+  allNotesCount = 0, 
+  filteredNotesCount = 0 
+}) => {
     if (showEmptyState && notes.length === 0) {
         return (
             <motion.div
@@ -16,14 +28,7 @@ const NotesList = ({ notes, onDeleteNote, onGoToLesson, showEmptyState = true, a
             >
                 <ApperIcon name="Search" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <Text as="h3" className="text-lg font-medium text-gray-900 mb-2">No notes found</Text>
-                <Text as="p" className="text-gray-600 mb-4">Try adjusting your search criteria</Text>
-                {/* Assumes clearing filters is handled by parent if notes.length === 0 and filter applied */}
-                <Button
-                    onClick={() => window.location.reload()} // A fallback, typically better to have a prop
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                    Show All Notes
-                </Button>
+                <Text as="p" className="text-gray-600 mb-4">Try adjusting your search criteria or create your first note</Text>
             </motion.div>
         );
     }
@@ -53,14 +58,13 @@ const NotesList = ({ notes, onDeleteNote, onGoToLesson, showEmptyState = true, a
                                 {format(new Date(note.updatedAt), 'MMM dd, yyyy • h:mm a')}
                             </Text>
                         </div>
-                        
-                        <div className="flex items-center space-x-2">
+<div className="flex items-center space-x-2">
                             <Button
-                                onClick={() => onGoToLesson(note.courseId, note.lessonId)}
+                                onClick={() => onEditNote(note)}
                                 className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                                title="Go to lesson"
+                                title="Edit note"
                             >
-                                <ApperIcon name="ExternalLink" className="w-4 h-4" />
+                                <ApperIcon name="Edit3" className="w-4 h-4" />
                             </Button>
                             <Button
                                 onClick={() => onDeleteNote(note.id, note.courseId)}
@@ -71,11 +75,39 @@ const NotesList = ({ notes, onDeleteNote, onGoToLesson, showEmptyState = true, a
                             </Button>
                         </div>
                     </div>
-                    
-                    <div 
-                        className="prose prose-sm max-w-none text-gray-700 break-words"
-                        dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
-                    />
+{editingNote && editingNote.id === note.id ? (
+                        <div className="space-y-4">
+                            <textarea
+                                value={editContent}
+                                onChange={(e) => onEditContentChange(e.target.value)}
+                                className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                                placeholder="Edit your note..."
+                            />
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    onClick={onSaveNote}
+                                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
+                                >
+                                    <ApperIcon name="Check" className="w-4 h-4 mr-1" />
+                                    Save
+                                </Button>
+                                <Button
+                                    onClick={onCancelEdit}
+                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                                >
+                                    <ApperIcon name="X" className="w-4 h-4 mr-1" />
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div 
+                            className="prose prose-sm max-w-none text-gray-700 break-words cursor-pointer hover:bg-gray-50 rounded p-2 -m-2 transition-colors"
+                            onClick={() => onEditNote(note)}
+                            title="Click to edit note"
+                            dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }}
+                        />
+                    )}
                 </motion.div>
             ))}
             
